@@ -141,8 +141,8 @@ const Login = () => {
                 <Input
                   type="radio"
                   name="role"
-                  value="student"
-                  checked={input.role === "student"}
+                  value="jobseeker"
+                  checked={input.role === "jobseeker"}
                   onChange={changeEventHandler}
                   className="w-4 h-4 accent-[#4a6741]"
                 />

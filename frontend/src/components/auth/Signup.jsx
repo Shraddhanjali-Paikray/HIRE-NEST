@@ -90,7 +90,7 @@ const Signup = () => {
 
     //prevents sending empty file
     if (input.file) {
-      formData.append("file", input.file);
+      formData.append("profilePhoto", input.file);
     }
     try {
       dispatch(setLoading(true));
@@ -113,7 +113,7 @@ const Signup = () => {
 //if user logged in->redirect to the home page
   useEffect(() => {
     if (user) navigate("/");
-  }, [user]);//change user
+  }, [user]);   //change user
 
   return (
   <div>
@@ -223,8 +223,8 @@ const Signup = () => {
               <Input
                 type="radio"
                 name="role"
-                value="student"
-                checked={input.role === "student"}
+                value="jobseeker"
+                checked={input.role === "jobseeker"}
                 onChange={changeEventHandler}
                 className="w-4 h-4 accent-[#4a6741]"
               />

@@ -1,0 +1,319 @@
+Job Portal Backend Notes (MERN)
+1. Backend Overview
+
+This backend is built using:
+     Node.js → runtime environment
+     Express.js → server framework
+     MongoDB → database
+     Mongoose → ODM for MongoDB
+
+Purpose of backend:-
+       Handle authentication
+       Store user data
+       Manage jobs
+       Manage job applications
+       Connect frontend with database
+
+Flow:
+    Frontend → API Request → Express Routes → Controller Logic → MongoDB
+
+2. Folder Structure Explanation:-
+
+Current backend structure:
+
+Backend
+│
+├── models
+│   ├── application.model.js
+│   ├── company.model.js
+│   ├── job.model.js
+│   └── user.model.js
+│
+├── utils
+│   └── db.js
+│
+├── .env
+├── index.js
+├── package.json
+
+Each folder has a specific responsibility. 
+
+1. index.js
+
+Purpose:
+Main entry file of backend.
+Responsibilities:
+      Create Express server
+      Connect database
+      Use middleware
+      Register routes
+      Start server
+
+Server example flow:
+
+Start server
+Connect database
+Load routes
+Listen on port
+
+4. package.json
+
+Purpose:
+    Stores project dependencies.
+
+Example dependencies:
+       express
+       mongoose
+       dotenv
+       cors
+       bcrypt
+       jsonwebtoken
+
+You install packages using:
+       npm install express mongoose cors dotenv
+
+
+5. .env File
+Purpose:
+Store environment variables.
+
+Example variables:
+
+PORT=5000
+MONGO_URI=your_database_url
+JWT_SECRET=secretkey
+
+Why use .env:
+   Keeps sensitive data safe
+   Easy to change configuration later
+
+
+
+
+4. utils Folder
+db.js
+
+Purpose:
+This file connects the backend to MongoDB database.
+Why this is separate:- 
+          Makes code cleaner
+          Database connection logic stays in one place
+
+Typical flow:-
+
+Start Server
+     ↓
+Connect Database
+     ↓
+Start API Routes
+
+
+
+1️⃣ Schema – Structure of Data
+
+A Schema defines what fields a document will have and what type of data they store.
+
+Think of a schema as a design or blueprint for data.
+
+It tells MongoDB:
+
+What fields are allowed
+
+What type each field should be
+
+Whether the field is required or optional
+
+Example: User Schema
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  password: String,
+  role: String
+});
+
+This means every user stored in the database will have:
+
+name
+email
+password
+role
+
+Example document following this schema:
+
+{
+  "name": "Anisha",
+  "email": "anisha@gmail.com",
+  "password": "123456",
+  "role": "jobseeker"
+}
+
+Simple way to remember:
+
+Schema = Structure / Rules of data
+
+2️⃣ Model – Object Used to Interact with Database
+
+A Model is created from a schema and is used to perform operations on the database.
+
+Using a model, you can:
+
+Insert data
+
+Find data
+
+Update data
+
+Delete data
+
+Example:
+
+const User = mongoose.model("User", userSchema);
+
+Now User becomes a model.
+
+You can use it like this:
+
+User.create()
+User.find()
+User.updateOne()
+User.deleteOne()
+
+Example:
+
+const user = new User({
+  name: "Anisha",
+  email: "anisha@gmail.com",
+  password: "123456"
+});
+
+await user.save();
+
+Simple way to remember:
+
+Model = Tool used to work with database
+
+3️⃣ Collection – Group of Documents
+
+A Collection is a group of similar documents stored in MongoDB.
+
+You can think of it like a table in SQL databases.
+
+Example collections in your job portal:
+
+users
+jobs
+applications
+companies
+
+If your system has 100 users, all of them are stored in the users collection.
+
+Example:
+
+users collection
+   ├── user1
+   ├── user2
+   ├── user3
+
+Simple way to remember:
+
+Collection = Group of documents
+
+4️⃣ Document – Single Record
+
+A Document is a single data entry stored in a collection.
+
+It is similar to a row in a SQL table.
+
+Example document in users collection:
+
+{
+  "_id": "6754abf23",
+  "name": "Anisha",
+  "email": "anisha@gmail.com",
+  "role": "jobseeker"
+}
+
+If there are 50 users, the users collection will contain 50 documents.
+
+Simple way to remember:
+
+Document = One record
+Example From Your Job Portal
+
+Database structure:
+
+Database
+   │
+   ├── users (collection)
+   │      ├── user document
+   │      ├── user document
+   │
+   ├── jobs (collection)
+   │      ├── job document
+   │
+   └── applications (collection)
+          ├── application document
+Easy Real-Life Analogy
+
+Think of a school register.
+
+Concept	Example
+Schema	Format of student information
+Model	System used to manage student data
+Collection	Class student list
+Document	One student record
+
+Example:
+
+Student Schema
+  ├ name
+  ├ rollNumber
+  ├ class
+
+Student collection:
+
+Student List
+   ├ Student 1
+   ├ Student 2
+   ├ Student 3
+Difference Between Schema and Model
+Feature	Schema	Model
+Meaning	Structure of data	Tool to interact with database
+Purpose	Defines fields and data types	Performs database operations
+Created using	mongoose.Schema()	mongoose.model()
+Used for	Designing data structure	CRUD operations
+
+Example:
+
+Schema:
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  email: String
+});
+
+Model:
+
+const User = mongoose.model("User", userSchema);
+Quick Memory Trick
+
+You can remember like this:
+
+Schema → Design of data
+Model → Manager of data
+Collection → Group of documents
+Document → One data record
+
+Example flow:
+
+Schema → Model → Collection → Document
+
+
+
+
+//multer
+//redux
+//toast
+//dispatch
+//{...input}
