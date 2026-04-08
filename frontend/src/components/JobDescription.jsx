@@ -1,111 +1,187 @@
-import { Badge } from "./ui/Badge";
-import React, { useEffect } from "react";
-import { Button } from "./ui/Button";
-import Navbar from "./shared/Navbar";
-import { useParams } from "react-router-dom";
-import { setSingleJob } from "@/redux/jobSlice";
-import axios from "axios";
-import { JOB_API_END_POINT } from "@/utils/constant";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { APPLICATION_API_END_POINT, JOB_API_END_POINT } from '@/utils/constant';
+import { setSingleJob } from '@/redux/jobSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'sonner';
+
+const pill = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '4px 12px',
+    borderRadius: '999px',
+    fontSize: '0.78rem',
+    fontWeight: 600,
+    letterSpacing: '0.01em',
+};
+
+const detailItem = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '2px',
+};
 
 const JobDescription = () => {
-  const isApplied = true;
-  const { singleJob } = useSelector((store) => store.job);
-  const { user } = useSelector((store) => store.auth);
-  const params = useParams();
-  const jobId = params.id;
-  const dispatch = useDispatch();
+    const { singleJob } = useSelector(store => store.job);
+    const { user } = useSelector(store => store.auth);
+    const isIntiallyApplied = singleJob?.applications?.some(application => application.applicant === user?._id) || false;
+    const [isApplied, setIsApplied] = useState(isIntiallyApplied);
 
-  useEffect(() => {
-    const fetchSingleJob = async () => {
-      try {
-        
-        const res = await axios.get(`${JOB_API_END_POINT}/get/${jobId}`, {
-          withCredentials: true,
-        });
-        console.log(res)
-        if (res.data.success) {
-          dispatch(setSingleJob(res.data.job));
+    const params = useParams();
+    const jobId = params.id;
+    const dispatch = useDispatch();
+
+    const applyJobHandler = async () => {
+        try {
+            const res = await axios.get(`${APPLICATION_API_END_POINT}/apply/${jobId}`, { withCredentials: true });
+            if (res.data.success) {
+                setIsApplied(true);
+                const updatedSingleJob = { ...singleJob, applications: [...singleJob.applications, { applicant: user?._id }] };
+                dispatch(setSingleJob(updatedSingleJob));
+                toast.success(res.data.message);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.response.data.message);
         }
-      } catch (error) {
-        console.log(error);
-      }
     };
-    fetchSingleJob();
-  }, [jobId, dispatch, user?._id]);
 
-  return (
-    <div className="bg-[#f5f0e8] min-h-screen">
-      <Navbar />
-      <div className="max-w-4xl mx-auto my-10 px-6 flex flex-col gap-4">
-        {/* Header card */}
-        <div className="bg-[#fdfaf4] border border-[#e0d5c0] rounded-2xl p-8 shadow-sm">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="font-bold text-2xl font-serif text-[#2c2415]">
-                {singleJob?.title}
-              </h1>
-              <div className="flex items-center gap-2 mt-4 flex-wrap">
-                <Badge className="text-[#4a6741] bg-[#eaf2e4] border-0 font-semibold text-xs">
-                  {singleJob?.position} Positions
-                </Badge>
-                <Badge className="text-[#8a4a20] bg-[#f5ece3] border-0 font-semibold text-xs">
-                  {singleJob?.jobType}
-                </Badge>
-                <Badge className="text-[#2c2415] bg-[#e8e0cc] border-0 font-semibold text-xs">
-                  {singleJob?.salary} LPA
-                </Badge>
-              </div>
+    useEffect(() => {
+        const fetchSingleJob = async () => {
+            try {
+                const res = await axios.get(`${JOB_API_END_POINT}/get/${jobId}`, { withCredentials: true });
+                if (res.data.success) {
+                    dispatch(setSingleJob(res.data.job));
+                    setIsApplied(res.data.job.applications.some(application => application.applicant === user?._id));
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fetchSingleJob();
+    }, [jobId, dispatch, user?._id]);
+
+    return (
+        <div style={{ maxWidth: '860px', margin: '2.5rem auto', padding: '0 1rem' }}>
+
+            {/* Top header */}
+            <div style={{
+                backgroundColor: '#f5f0e6',
+                border: '1px solid #d6cbaa',
+                borderRadius: '16px',
+                padding: '1.5rem',
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'space-between',
+                gap: '1rem',
+                marginBottom: '1.25rem',
+            }}>
+                <div>
+                    <h1 style={{
+                        color: '#2c3e1f',
+                        fontFamily: 'Georgia, serif',
+                        fontSize: '1.4rem',
+                        fontWeight: 700,
+                        margin: '0 0 0.85rem',
+                    }}>
+                        {singleJob?.title}
+                    </h1>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        <span style={{ ...pill, backgroundColor: '#e8f0dc', color: '#3a5a1c', border: '1px solid #b5cc90' }}>
+                            {singleJob?.postion} Positions
+                        </span>
+                        <span style={{ ...pill, backgroundColor: '#fdf3e3', color: '#8a5e1a', border: '1px solid #e8c88a' }}>
+                            {singleJob?.jobType}
+                        </span>
+                        <span style={{ ...pill, backgroundColor: '#e4ede0', color: '#3a5a1c', border: '1px solid #a8c48a' }}>
+                            {singleJob?.salary} LPA
+                        </span>
+                    </div>
+                </div>
+
+                <button
+                    onClick={isApplied ? null : applyJobHandler}
+                    disabled={isApplied}
+                    style={{
+                        flexShrink: 0,
+                        padding: '10px 22px',
+                        borderRadius: '8px',
+                        fontSize: '0.875rem',
+                        fontWeight: 600,
+                        cursor: isApplied ? 'not-allowed' : 'pointer',
+                        border: 'none',
+                        backgroundColor: isApplied ? '#c8c4b8' : '#3a5a1c',
+                        color: isApplied ? '#7a7a6e' : '#f5f0e6',
+                        transition: 'background-color 0.15s ease',
+                    }}
+                    onMouseEnter={e => { if (!isApplied) e.currentTarget.style.backgroundColor = '#2c4415'; }}
+                    onMouseLeave={e => { if (!isApplied) e.currentTarget.style.backgroundColor = '#3a5a1c'; }}
+                >
+                    {isApplied ? 'Already Applied' : 'Apply Now'}
+                </button>
             </div>
-            <Button
-              disabled={isApplied}
-              className={`rounded-lg font-semibold text-sm h-10 px-5 transition-colors duration-150 ${
-                isApplied
-                  ? "bg-[#9a8a6a] cursor-not-allowed text-white"
-                  : "bg-[#4a6741] hover:bg-[#3a5233] text-white"
-              }`}
-            >
-              {isApplied ? "Already Applied" : "Apply Now"}
-            </Button>
-          </div>
-        </div>
 
-        {/* Details card */}
-        <div className="bg-[#fdfaf4] border border-[#e0d5c0] rounded-2xl p-8 shadow-sm">
-          <h1 className="font-bold text-lg font-serif text-[#2c2415] pb-4 border-b border-[#e0d5c0]">
-            {singleJob?.description}
-          </h1>
-          <div className="mt-5 flex flex-col gap-3">
-            {[
-              { label: "Role", value: singleJob?.title },
-              { label: "Location", value: singleJob?.location },
-              { label: "Description", value: singleJob?.description },
-              {
-                label: "Experience",
-                value: `${singleJob?.experienceLevel} yrs`,
-              },
-              { label: "Salary", value: `${singleJob?.salary} LPA` },
-              {
-                label: "Total Applicants",
-                value: singleJob?.applications?.length || 0,
-              },
-              {
-                label: "Posted Date",
-                value: new Date(singleJob?.createdAt).toLocaleDateString(),
-              },
-            ].map((item, index) => (
-              <div key={index} className="flex gap-2 text-sm">
-                <span className="font-semibold text-[#2c2415] min-w-[150px]">
-                  {item.label}:
-                </span>
-                <span className="text-[#6b5c45]">{item.value}</span>
-              </div>
-            ))}
-          </div>
+            {/* Description section */}
+            <div style={{
+                backgroundColor: '#faf7f0',
+                border: '1px solid #d6cbaa',
+                borderRadius: '16px',
+                padding: '1.75rem',
+            }}>
+                <p style={{
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    color: '#4a6428',
+                    margin: '0 0 1.5rem',
+                }}>
+                    Job Details
+                </p>
+
+                {/* 2-column grid of detail items */}
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                    gap: '1.25rem 2rem',
+                    marginBottom: '1.5rem',
+                }}>
+                    {[
+                        { label: 'Role', value: singleJob?.title },
+                        { label: 'Location', value: singleJob?.location },
+                        { label: 'Experience', value: singleJob?.experience ? `${singleJob.experience} yrs` : '—' },
+                        { label: 'Salary', value: singleJob?.salary ? `${singleJob.salary} LPA` : '—' },
+                        { label: 'Total Applicants', value: singleJob?.applications?.length },
+                        { label: 'Posted Date', value: singleJob?.createdAt?.split("T")[0] },
+                    ].map(({ label, value }) => (
+                        <div key={label} style={detailItem}>
+                            <span style={{ fontSize: '0.72rem', color: '#7a8c5e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                                {label}
+                            </span>
+                            <span style={{ fontSize: '0.95rem', color: '#2c3e1f', fontWeight: 500 }}>
+                                {value ?? '—'}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Description full-width block */}
+                <div style={{ borderTop: '1px solid #d6cbaa', paddingTop: '1.25rem' }}>
+                    <span style={{
+                        fontSize: '0.72rem', color: '#7a8c5e', fontWeight: 600,
+                        textTransform: 'uppercase', letterSpacing: '0.06em',
+                        display: 'block', marginBottom: '0.5rem'
+                    }}>
+                        Description
+                    </span>
+                    <p style={{ fontSize: '0.95rem', color: '#3c3528', lineHeight: 1.75, margin: 0 }}>
+                        {singleJob?.description}
+                    </p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default JobDescription;

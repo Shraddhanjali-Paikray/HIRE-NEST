@@ -29,7 +29,7 @@ const Job = ({job}) => {
       {/* Company */}
       <div className="flex items-center gap-3 my-3">
         <Avatar className="w-10 h-10 border border-[#e0d5c0]">
-          <AvatarImage src={logo} />
+          <AvatarImage src={job?.company?.logo} />
         </Avatar>
         <div>
           <h1 className="font-semibold text-[#2c2415] text-base">{job?.company?.name}</h1>

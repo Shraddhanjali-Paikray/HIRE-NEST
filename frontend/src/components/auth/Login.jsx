@@ -67,7 +67,11 @@ const Login = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.message);
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Unable to login. Please try again.";
+      toast.error(message);
     } finally {
       dispatch(setLoading(false));
     }
@@ -141,8 +145,8 @@ const Login = () => {
                 <Input
                   type="radio"
                   name="role"
-                  value="student"
-                  checked={input.role === "student"}
+                  value="jobseeker"
+                  checked={input.role === "jobseeker"}
                   onChange={changeEventHandler}
                   className="w-4 h-4 accent-[#4a6741]"
                 />

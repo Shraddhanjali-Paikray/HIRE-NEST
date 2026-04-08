@@ -90,7 +90,7 @@ const Signup = () => {
 
     //prevents sending empty file
     if (input.file) {
-      formData.append("file", input.file);
+      formData.append("profilePhoto", input.file);
     }
     try {
       dispatch(setLoading(true));
@@ -105,7 +105,11 @@ const Signup = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.message);
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Unable to register. Please try again.";
+      toast.error(message);
     } finally {
       dispatch(setLoading(false));
     }
@@ -113,7 +117,7 @@ const Signup = () => {
 //if user logged in->redirect to the home page
   useEffect(() => {
     if (user) navigate("/");
-  }, [user]);//change user
+  }, [user]);   //change user
 
   return (
   <div>
@@ -223,8 +227,8 @@ const Signup = () => {
               <Input
                 type="radio"
                 name="role"
-                value="student"
-                checked={input.role === "student"}
+                value="jobseeker"
+                checked={input.role === "jobseeker"}
                 onChange={changeEventHandler}
                 className="w-4 h-4 accent-[#4a6741]"
               />
