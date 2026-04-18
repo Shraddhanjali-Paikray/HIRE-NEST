@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 
 const LatestJobs = () => {
   const { allJobs } = useSelector((store) => store.job);
+  
   return (
     <div className="max-w-7xl mx-auto my-20 px-6">
       <h1 className="text-4xl font-bold font-serif text-[#2c2415]">
@@ -18,7 +19,7 @@ const LatestJobs = () => {
         ) : (
           allJobs
             ?.slice(0, 6)
-            .map((job) => <LatestJobCards key={job._id} job={job} />)
+            .map((job) => <LatestJobCards  key={job._id} job={job} />)
         )}
       </div>
     </div>

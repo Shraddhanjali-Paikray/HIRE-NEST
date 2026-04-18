@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/Dialog'
 import { Label } from './ui/label'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
@@ -20,7 +20,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
         phoneNumber: user?.phoneNumber || "",
         bio: user?.profile?.bio || "",
         skills: user?.profile?.skills?.join(",") || "",
-        file: user?.profile?.resume || "",
+        file: null,
         profilePhoto: ""
     });
 
@@ -32,7 +32,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                 phoneNumber: user?.phoneNumber || "",
                 bio: user?.profile?.bio || "",
                 skills: user?.profile?.skills?.join(",") || "",
-                file: user?.profile?.resume || "",
+                file: null,
                 profilePhoto: ""
             });
         }
@@ -57,8 +57,8 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
         formData.append("phoneNumber", input.phoneNumber);
         formData.append("bio", input.bio);
         formData.append("skills", input.skills);
-        if (input.file) formData.append("file", input.file);
-        if (input.profilePhoto) formData.append("profilePhoto", input.profilePhoto);
+        if (input.file instanceof File) formData.append("file", input.file);
+        if (input.profilePhoto instanceof File) formData.append("profilePhoto", input.profilePhoto);
 
         try {
             setLoading(true);
