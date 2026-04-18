@@ -14,6 +14,8 @@ import {
 import storage from 'redux-persist/lib/storage'
 import companySlice from "./companySlice";
 import applicationSlice from "./applicationSlice";
+import savedJobsReducer from "./savedJobsSlice";       // your addition
+import notificationSlice from "./notificationSlice";   // friend's addition
 
 const persistConfig = {
     key: 'root',
@@ -22,14 +24,15 @@ const persistConfig = {
 }
 
 const rootReducer = combineReducers({
-    auth:authSlice,
-    job:jobSlice,
-    company:companySlice,
-    application:applicationSlice
+    auth: authSlice,
+    job: jobSlice,
+    company: companySlice,
+    application: applicationSlice,
+    savedJobs: savedJobsReducer,         // your saved jobs feature
+    notification: notificationSlice,     // friend's notification feature
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
-
 
 const store = configureStore({
     reducer: persistedReducer,
@@ -40,4 +43,6 @@ const store = configureStore({
             },
         }),
 });
+
+export const persistor = persistStore(store); // your export for Navbar purge
 export default store;

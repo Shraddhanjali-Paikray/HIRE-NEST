@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../shared/Navbar";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { RadioGroup } from "../ui/Radio-group";
+import { RadioGroup } from "../ui/radio-group";
 import { Button } from "../ui/Button";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -102,9 +102,8 @@ const Login = () => {
               value={input.email}
               onChange={changeEventHandler}
               placeholder="Enter your email"
-              className={`h-11 rounded-lg border ${
-                errors.email ? "border-red-500" : "border-[#d9cdb8]"
-              } bg-white text-[#2c2415] text-sm px-3 focus-visible:ring-2 focus-visible:ring-[#4a6741] focus-visible:border-[#4a6741] placeholder:text-[#b5a898]`}
+              className={`h-11 rounded-lg border ${errors.email ? "border-red-500" : "border-[#d9cdb8]"
+                } bg-white text-[#2c2415] text-sm px-3 focus-visible:ring-2 focus-visible:ring-[#4a6741] focus-visible:border-[#4a6741] placeholder:text-[#b5a898]`}
             />
             {errors.email && (
               <p className="text-red-500 text-xs mt-1">{errors.email}</p>
@@ -122,9 +121,8 @@ const Login = () => {
               value={input.password}
               onChange={changeEventHandler}
               placeholder="••••••••"
-              className={`h-11 rounded-lg border ${
-                errors.password ? "border-red-500" : "border-[#d9cdb8]"
-              } bg-white text-[#2c2415] text-sm px-3 focus-visible:ring-2 focus-visible:ring-[#4a6741] focus-visible:border-[#4a6741] placeholder:text-[#b5a898]`}
+              className={`h-11 rounded-lg border ${errors.password ? "border-red-500" : "border-[#d9cdb8]"
+                } bg-white text-[#2c2415] text-sm px-3 focus-visible:ring-2 focus-visible:ring-[#4a6741] focus-visible:border-[#4a6741] placeholder:text-[#b5a898]`}
             />
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">{errors.password}</p>

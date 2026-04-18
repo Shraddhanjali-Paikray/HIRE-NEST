@@ -17,6 +17,14 @@ const Profile = () => {
   const [open, setOpen] = useState(false);
   const { user } = useSelector((store) => store.auth);
 
+  // Handle both array and comma-separated string from backend
+  const raw = user?.profile?.skills;
+  const skills = Array.isArray(raw)
+    ? raw.flatMap(s => s.split(",").map(x => x.trim())).filter(Boolean)
+    : typeof raw === "string"
+    ? raw.split(",").map(s => s.trim()).filter(Boolean)
+    : [];
+
   return (
     <div className="bg-[#f5f0e8] min-h-screen">
       <Navbar />
@@ -54,18 +62,17 @@ const Profile = () => {
         <div className="my-5">
           <h2 className="font-semibold text-[#2c2415] mb-2">Skills</h2>
           <div className="flex items-center gap-2 flex-wrap">
-            {user?.profile?.skills.length !== 0 ? (
-              user?.profile?.skills.map((item, index) => (
-                <Badge
-                  key={index}
-                  className="bg-[#e8e0cc] text-[#4a6741] border border-[#d4c9a8] hover:bg-[#ddd5bc]"
-                >
-                  {item}
-                </Badge>
-              ))
-            ) : (
-              <span className="text-[#9a8a6a] text-sm">NA</span>
-            )}
+            {skills.length > 0
+              ? skills.map((skill, index) => (
+                  <Badge
+                    key={index}
+                    className="bg-[#e8e0cc] text-[#4a6741] border border-[#d4c9a8] hover:bg-[#ddd5bc]"
+                  >
+                    {skill}
+                  </Badge>
+                ))
+              : <span className="text-[#9a8a6a] text-sm">NA</span>
+            }
           </div>
         </div>
 

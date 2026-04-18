@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Navbar from '../shared/Navbar'
 import { useSelector } from 'react-redux'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/Select'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import axios from 'axios'
 import { JOB_API_END_POINT } from '@/utils/constant'
 import { toast } from 'sonner'
@@ -62,16 +62,29 @@ const PostJob = () => {
         e.preventDefault();
         try {
             setLoading(true);
-            const res = await axios.post(`${JOB_API_END_POINT}/post`, input, {
+    
+            const payload = {
+                ...input,
+                salary: Number(input.salary.replace(/[^0-9]/g, "").slice(0, 5)),
+                experienceLevel:
+                    input.experience.toLowerCase().includes("fresher") ? 0 :
+                    input.experience.match(/\d+/) ? Number(input.experience.match(/\d+/)[0]) : 0,
+                position: Number(input.position),
+                requirements: input.requirements.split(',').map(r => r.trim()),
+                company: input.companyId
+            };
+    
+            const res = await axios.post(`${JOB_API_END_POINT}/post`, payload, {
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
             });
+    
             if (res.data.success) {
                 toast.success(res.data.message);
                 navigate("/admin/jobs");
             }
         } catch (error) {
-            toast.error(error.response.data.message);
+            toast.error(error.response?.data?.message || "Something went wrong");
         } finally {
             setLoading(false);
         }

@@ -12,11 +12,15 @@ const Home = () => {
   useGetAllJobs();
   const { user } = useSelector(store => store.auth);
   const navigate = useNavigate();
+
   useEffect(() => {
-    if (user?.role === 'recruiter') {
-      navigate("/admin/companies");
+    if (!user) {
+      navigate("/landing");         // logged-out users go to landing page
+    } else if (user.role === 'recruiter') {
+      navigate("/admin/companies"); // recruiters go to admin
     }
-  }, []);
+  }, [user]);
+
   return (
     <div>
       <Navbar />
