@@ -12,8 +12,8 @@ const AdminJobsTable = () => {
     useEffect(() => {
         const filteredJobs = allAdminJobs.filter((job) => {
             if (!searchJobByText) return true;
-            return job?.title?.toLowerCase().includes(searchJobByText.toLowerCase())
-                || job?.company?.name?.toLowerCase().includes(searchJobByText.toLowerCase());
+            return job?.title?.toLowerCase().includes(searchJobByText.toLowerCase()) ||
+                job?.company?.name.toLowerCase().includes(searchJobByText.toLowerCase());
         });
         setFilterJobs(filteredJobs);
     }, [allAdminJobs, searchJobByText]);
@@ -26,16 +26,18 @@ const AdminJobsTable = () => {
                 <thead>
                     <tr style={{ backgroundColor: '#eee8d8', borderBottom: '1px solid #d6cbaa' }}>
                         {['Company Name', 'Role', 'Date', 'Action'].map((col, i) => (
-                            <th key={col} style={{
-                                padding: '12px 20px',
-                                fontSize: '0.7rem',
-                                fontWeight: 700,
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.08em',
-                                color: '#4a6428',
-                                textAlign: i === 3 ? 'right' : 'left',
-                                whiteSpace: 'nowrap',
-                            }}>
+                            <th
+                                key={col}
+                                style={{
+                                    padding: '12px 20px',
+                                    fontSize: '0.7rem',
+                                    fontWeight: 700,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.08em',
+                                    color: '#4a6428',
+                                    textAlign: i === 3 ? 'right' : 'left',
+                                }}
+                            >
                                 {col}
                             </th>
                         ))}
@@ -44,7 +46,7 @@ const AdminJobsTable = () => {
 
                 {/* Body */}
                 <tbody>
-                    {!filterJobs?.length ? (
+                    {filterJobs?.length === 0 ? (
                         <tr>
                             <td colSpan={4} style={{
                                 padding: '2.5rem',
@@ -57,7 +59,7 @@ const AdminJobsTable = () => {
                             </td>
                         </tr>
                     ) : (
-                        filterJobs.map((job, idx) => (
+                        filterJobs?.map((job, idx) => (
                             <tr
                                 key={job._id}
                                 style={{
@@ -77,16 +79,7 @@ const AdminJobsTable = () => {
 
                                 {/* Role */}
                                 <td style={{ padding: '14px 20px' }}>
-                                    <span style={{
-                                        display: 'inline-block',
-                                        padding: '3px 10px',
-                                        borderRadius: '999px',
-                                        fontSize: '0.8rem',
-                                        fontWeight: 600,
-                                        backgroundColor: '#e8f0dc',
-                                        color: '#3a5a1c',
-                                        border: '1px solid #b5cc90',
-                                    }}>
+                                    <span style={{ fontSize: '0.875rem', color: '#4a3f2f' }}>
                                         {job?.title}
                                     </span>
                                 </td>
@@ -94,7 +87,7 @@ const AdminJobsTable = () => {
                                 {/* Date */}
                                 <td style={{ padding: '14px 20px' }}>
                                     <span style={{ fontSize: '0.85rem', color: '#7a8c5e' }}>
-                                        {job?.createdAt?.split("T")[0]}
+                                        {job?.createdAt.split("T")[0]}
                                     </span>
                                 </td>
 
@@ -119,27 +112,23 @@ const AdminJobsTable = () => {
                                                 <MoreHorizontal size={16} />
                                             </button>
                                         </PopoverTrigger>
-                                        <PopoverContent style={{
-                                            backgroundColor: '#faf7f0',
-                                            border: '1px solid #d6cbaa',
-                                            borderRadius: '10px',
-                                            padding: '6px',
-                                            boxShadow: '0 4px 16px rgba(45,80,22,0.10)',
-                                            width: '140px',
-                                        }}>
-                                            {/* Edit */}
+                                        <PopoverContent
+                                            className="w-36"
+                                            style={{
+                                                backgroundColor: '#faf7f0',
+                                                border: '1px solid #d6cbaa',
+                                                borderRadius: '10px',
+                                                padding: '6px',
+                                                boxShadow: '0 4px 16px rgba(45,80,22,0.10)',
+                                            }}
+                                        >
                                             <div
-                                                onClick={() => navigate(`/admin/companies/${job._id}`)}
+                                                onClick={() => navigate(`/admin/jobs/${job._id}/edit`)}
                                                 style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '8px',
-                                                    padding: '8px 10px',
-                                                    borderRadius: '7px',
-                                                    cursor: 'pointer',
-                                                    color: '#2c3e1f',
-                                                    fontSize: '0.85rem',
-                                                    fontWeight: 500,
+                                                    display: 'flex', alignItems: 'center', gap: '8px',
+                                                    padding: '8px 10px', borderRadius: '7px',
+                                                    cursor: 'pointer', color: '#2c3e1f',
+                                                    fontSize: '0.85rem', fontWeight: 500,
                                                     transition: 'background-color 0.12s ease',
                                                 }}
                                                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e8f0dc'}
@@ -148,21 +137,15 @@ const AdminJobsTable = () => {
                                                 <Edit2 size={14} color="#4a6428" />
                                                 Edit
                                             </div>
-
-                                            {/* Applicants */}
                                             <div
                                                 onClick={() => navigate(`/admin/jobs/${job._id}/applicants`)}
                                                 style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '8px',
-                                                    padding: '8px 10px',
-                                                    borderRadius: '7px',
-                                                    cursor: 'pointer',
-                                                    color: '#2c3e1f',
-                                                    fontSize: '0.85rem',
-                                                    fontWeight: 500,
+                                                    display: 'flex', alignItems: 'center', gap: '8px',
+                                                    padding: '8px 10px', borderRadius: '7px',
+                                                    cursor: 'pointer', color: '#2c3e1f',
+                                                    fontSize: '0.85rem', fontWeight: 500,
                                                     transition: 'background-color 0.12s ease',
+                                                    marginTop: '2px',
                                                 }}
                                                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e8f0dc'}
                                                 onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}

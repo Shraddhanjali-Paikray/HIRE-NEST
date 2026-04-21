@@ -212,7 +212,7 @@ const Signup = () => {
           {/* Role validation */}
           <div className="flex flex-col gap-1.5 mb-4">
             <Label className="text-xs font-semibold text-[#4a3f2f] uppercase tracking-widest">
-              Role
+              Role <span className="text-red-500">*</span>
             </Label>
             <RadioGroup className="flex flex-row gap-6 pt-1">
               <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-[#4a3f2f]">

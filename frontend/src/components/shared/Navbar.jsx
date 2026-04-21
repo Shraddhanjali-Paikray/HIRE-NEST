@@ -112,14 +112,14 @@ const Navbar = () => {
           {!user ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Link to="/login">
-                <button style={{ height: '36px', padding: '0 16px', fontSize: '0.85rem', fontWeight: 600, border: '1px solid #d6cbaa', borderRadius: '8px', backgroundColor: 'transparent', color: '#4a3f2f', cursor: 'pointer', transition: 'all 0.15s ease' }}
+                <button style={{ height: '36px', padding: '0 16px', fontSize: '0.9rem', fontWeight: 600, fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif', border: '1px solid #d6cbaa', borderRadius: '8px', backgroundColor: 'transparent', color: '#4a3f2f', cursor: 'pointer', transition: 'all 0.15s ease' }}
                   onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#eee8d8'; e.currentTarget.style.borderColor = '#4a6428'; }}
                   onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.borderColor = '#d6cbaa'; }}>
                   Sign In
                 </button>
               </Link>
               <Link to="/signup">
-                <button style={{ height: '36px', padding: '0 16px', fontSize: '0.85rem', fontWeight: 600, border: '1px solid #3a5a1c', borderRadius: '8px', backgroundColor: '#3a5a1c', color: '#f5f0e6', cursor: 'pointer', transition: 'all 0.15s ease' }}
+                <button style={{ height: '36px', padding: '0 16px', fontSize: '0.9rem', fontWeight: 600, fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif', border: '1px solid #3a5a1c', borderRadius: '8px', backgroundColor: '#3a5a1c', color: '#f5f0e6', cursor: 'pointer', transition: 'all 0.15s ease' }}
                   onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#2c4415'; }}
                   onMouseLeave={e => { e.currentTarget.style.backgroundColor = '#3a5a1c'; }}>
                   Register
@@ -127,7 +127,7 @@ const Navbar = () => {
               </Link>
             </div>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
 
               {/* Notification bell */}
               <Popover>
@@ -208,7 +208,7 @@ const Navbar = () => {
 
 const NavLink = ({ to, children }) => (
   <li>
-    <Link to={to} style={{ fontSize: '0.9rem', fontWeight: 500, color: '#3c3528', textDecoration: 'none', padding: '4px 2px', borderBottom: '2px solid transparent', transition: 'color 0.15s ease, border-color 0.15s ease' }}
+    <Link to={to} style={{ fontSize: '0.9rem', fontWeight: 600, color: '#3c3528', textDecoration: 'none', padding: '4px 2px', borderBottom: '2px solid transparent', transition: 'color 0.15s ease, border-color 0.15s ease', fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif" }}
       onMouseEnter={e => { e.currentTarget.style.color = '#3a5a1c'; e.currentTarget.style.borderBottomColor = '#3a5a1c'; }}
       onMouseLeave={e => { e.currentTarget.style.color = '#3c3528'; e.currentTarget.style.borderBottomColor = 'transparent'; }}>
       {children}

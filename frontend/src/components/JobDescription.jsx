@@ -95,7 +95,7 @@ const JobDescription = () => {
                             {singleJob?.jobType}
                         </span>
                         <span style={{ ...pill, backgroundColor: '#e4ede0', color: '#3a5a1c', border: '1px solid #a8c48a' }}>
-                            {singleJob?.salary} LPA
+                            {singleJob?.salary ? `₹${singleJob.salary} LPA` : 'N/A'}
                         </span>
                     </div>
                 </div>
@@ -150,8 +150,8 @@ const JobDescription = () => {
                     {[
                         { label: 'Role', value: singleJob?.title },
                         { label: 'Location', value: singleJob?.location },
-                        { label: 'Experience', value: singleJob?.experience ? `${singleJob.experience} yrs` : '—' },
-                        { label: 'Salary', value: singleJob?.salary ? `${singleJob.salary} LPA` : '—' },
+                        { label: 'Experience', value: singleJob?.experienceLevel || singleJob?.experience || singleJob?.experienceLevel || '—' },
+                        { label: 'Salary', value: singleJob?.salary ? `₹${singleJob.salary} LPA` : '—' },
                         { label: 'Total Applicants', value: singleJob?.applications?.length },
                         { label: 'Posted Date', value: singleJob?.createdAt?.split("T")[0] },
                     ].map(({ label, value }) => (

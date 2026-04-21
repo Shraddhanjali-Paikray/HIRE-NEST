@@ -33,7 +33,7 @@ const AdminJobs = () => {
             Jobs
           </h1>
           <p style={{ fontSize: '0.85rem', color: '#7a8c5e', margin: 0 }}>
-            Manage and track all posted job listings
+            Manage and browse posted jobs
           </p>
         </div>
 
@@ -46,7 +46,6 @@ const AdminJobs = () => {
           marginBottom: '1.25rem',
           flexWrap: 'wrap',
         }}>
-          {/* Search input */}
           <div style={{ position: 'relative', flexShrink: 0 }}>
             <svg
               style={{
@@ -63,7 +62,7 @@ const AdminJobs = () => {
             </svg>
             <input
               type="text"
-              placeholder="Filter by name, role…"
+              placeholder="Filter by name, role"
               onChange={(e) => setInput(e.target.value)}
               style={{
                 paddingLeft: '32px',
@@ -76,15 +75,13 @@ const AdminJobs = () => {
                 backgroundColor: '#faf7f0',
                 color: '#2c3e1f',
                 outline: 'none',
-                width: '240px',
+                width: '220px',
                 transition: 'border-color 0.15s ease',
               }}
               onFocus={e => e.currentTarget.style.borderColor = '#3a5a1c'}
               onBlur={e => e.currentTarget.style.borderColor = '#c8bc96'}
             />
           </div>
-
-          {/* New Jobs button */}
           <button
             onClick={() => navigate("/admin/jobs/create")}
             style={{
@@ -108,7 +105,7 @@ const AdminJobs = () => {
               stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 5v14M5 12h14" />
             </svg>
-            New Job
+            New Jobs
           </button>
         </div>
 
@@ -121,10 +118,9 @@ const AdminJobs = () => {
         }}>
           <AdminJobsTable />
         </div>
-
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AdminJobs;
+export default AdminJobs

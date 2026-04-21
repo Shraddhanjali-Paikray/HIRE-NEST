@@ -18,11 +18,11 @@ const Login = () => {
     password: "",
     role: "",
   });
-  const [errors, setErrors] = useState({});
 
+  const [errors, setErrors] = useState({});
   const { loading, user } = useSelector((store) => store.auth);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -30,23 +30,19 @@ const Login = () => {
 
   const validateForm = () => {
     let newErrors = {};
-
     if (!input.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(input.email)) {
       newErrors.email = "Enter a valid email";
     }
-
     if (!input.password.trim()) {
       newErrors.password = "Password is required";
     } else if (input.password.length < 6) {
       newErrors.password = "Minimum 6 characters required";
     }
-
     if (!input.role) {
       newErrors.role = "Please select a role";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -56,10 +52,11 @@ const Login = () => {
     if (!validateForm()) return;
     try {
       dispatch(setLoading(true));
-      const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      });
+      const res = await axios.post(
+        `${USER_API_END_POINT}/login`,
+        { email: input.email, password: input.password, role: input.role },
+        { withCredentials: true }
+      );
       if (res.data.success) {
         dispatch(setUser(res.data.user));
         navigate("/");
@@ -67,7 +64,11 @@ const Login = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response.data.message);
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Login failed. Please try again.";
+      toast.error(message);
     } finally {
       dispatch(setLoading(false));
     }
@@ -75,7 +76,7 @@ const Login = () => {
 
   useEffect(() => {
     if (user) navigate("/");
-  }, []);
+  }, [user]);
 
   return (
     <div>
@@ -86,15 +87,18 @@ const Login = () => {
           onSubmit={submitHandler}
           className="w-full max-w-md bg-[#fdfaf4] border border-[#e0d5c0] rounded-2xl px-10 py-10 shadow-md"
         >
-          {/* Title */}
-          <h1 className="text-4xl font-bold text-center text-[#2c2415] mb-8 font-serif tracking-tight">
-            Login
+          {/* Title — identical classes to Signup */}
+          <h1 className="text-4xl font-bold text-center text-[#2c2415] mb-2 font-serif tracking-tight">
+            Welcome Back
           </h1>
+          <p className="text-sm text-center text-[#7a6a52] font-serif mb-8">
+            Sign in to continue to Hire Nest
+          </p>
 
           {/* Email */}
           <div className="flex flex-col gap-1.5 mb-4">
             <Label className="text-xs font-semibold text-[#4a3f2f] uppercase tracking-widest">
-              Email
+              Email <span className="text-red-500">*</span>
             </Label>
             <Input
               type="email"
@@ -102,8 +106,9 @@ const Login = () => {
               value={input.email}
               onChange={changeEventHandler}
               placeholder="Enter your email"
-              className={`h-11 rounded-lg border ${errors.email ? "border-red-500" : "border-[#d9cdb8]"
-                } bg-white text-[#2c2415] text-sm px-3 focus-visible:ring-2 focus-visible:ring-[#4a6741] focus-visible:border-[#4a6741] placeholder:text-[#b5a898]`}
+              className={`h-11 rounded-lg border ${
+                errors.email ? "border-red-500" : "border-[#d9cdb8]"
+              } bg-white text-[#2c2415] text-sm px-3 focus-visible:ring-2 focus-visible:ring-[#4a6741] focus-visible:border-[#4a6741] placeholder:text-[#b5a898]`}
             />
             {errors.email && (
               <p className="text-red-500 text-xs mt-1">{errors.email}</p>
@@ -113,7 +118,7 @@ const Login = () => {
           {/* Password */}
           <div className="flex flex-col gap-1.5 mb-4">
             <Label className="text-xs font-semibold text-[#4a3f2f] uppercase tracking-widest">
-              Password
+              Password <span className="text-red-500">*</span>
             </Label>
             <Input
               type="password"
@@ -121,8 +126,9 @@ const Login = () => {
               value={input.password}
               onChange={changeEventHandler}
               placeholder="••••••••"
-              className={`h-11 rounded-lg border ${errors.password ? "border-red-500" : "border-[#d9cdb8]"
-                } bg-white text-[#2c2415] text-sm px-3 focus-visible:ring-2 focus-visible:ring-[#4a6741] focus-visible:border-[#4a6741] placeholder:text-[#b5a898]`}
+              className={`h-11 rounded-lg border ${
+                errors.password ? "border-red-500" : "border-[#d9cdb8]"
+              } bg-white text-[#2c2415] text-sm px-3 focus-visible:ring-2 focus-visible:ring-[#4a6741] focus-visible:border-[#4a6741] placeholder:text-[#b5a898]`}
             />
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">{errors.password}</p>
@@ -132,7 +138,7 @@ const Login = () => {
           {/* Role */}
           <div className="flex flex-col gap-1.5 mb-6">
             <Label className="text-xs font-semibold text-[#4a3f2f] uppercase tracking-widest">
-              Role
+              Role <span className="text-red-500">*</span>
             </Label>
             <RadioGroup className="flex flex-row gap-6 pt-1">
               <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-[#4a3f2f]">
@@ -174,18 +180,15 @@ const Login = () => {
               type="submit"
               className="w-full h-11 bg-[#4a6741] hover:bg-[#3a5233] text-white font-semibold rounded-lg text-sm tracking-wide mb-5"
             >
-              Login
+              Sign In
             </Button>
           )}
 
-          {/* Signup link */}
+          {/* Register link */}
           <p className="text-sm text-[#6b5c45] text-center">
             Don't have an account?{" "}
-            <Link
-              to="/signup"
-              className="text-[#4a6741] font-semibold hover:underline"
-            >
-              Signup
+            <Link to="/signup" className="text-[#4a6741] font-semibold hover:underline">
+              Register
             </Link>
           </p>
         </form>

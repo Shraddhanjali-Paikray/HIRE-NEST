@@ -32,14 +32,14 @@ const labelStyle = {
 }
 
 const fields = [
-    { label: 'Title',           name: 'title',       type: 'text'   },
-    { label: 'Description',     name: 'description', type: 'text'   },
-    { label: 'Requirements',    name: 'requirements',type: 'text'   },
-    { label: 'Salary',          name: 'salary',      type: 'text'   },
-    { label: 'Location',        name: 'location',    type: 'text'   },
-    { label: 'Job Type',        name: 'jobType',     type: 'text'   },
-    { label: 'Experience Level',name: 'experience',  type: 'text'   },
-    { label: 'No. of Positions',name: 'position',    type: 'number' },
+    { label: 'Title',                    name: 'title',       type: 'text',   required: true  },
+    { label: 'Description',              name: 'description', type: 'text',   required: true  },
+    { label: 'Requirements',             name: 'requirements',type: 'text',   required: true  },
+    { label: 'Salary (in LPA)',          name: 'salary',      type: 'number', required: true  },
+    { label: 'Location',                 name: 'location',    type: 'text',   required: true  },
+    { label: 'Job Type',                 name: 'jobType',     type: 'text',   required: true  },
+    { label: 'Experience Level',         name: 'experience',  type: 'text',   required: false },
+    { label: 'No. of Positions',         name: 'position',    type: 'number', required: true  },
 ]
 
 const PostJob = () => {
@@ -60,31 +60,25 @@ const PostJob = () => {
 
     const submitHandler = async (e) => {
         e.preventDefault();
+
+        // Strip non-numeric chars from salary so backend gets a number e.g. "₹10,000/mo" → 10000
+        const parsedPosition = Number(input.position) || 0;
+        // Send salary as plain number — enter just a number e.g. 15000
+        const parsedSalary = Number(String(input.salary).replace(/[^\d]/g, '')) || 0;
+        const payload = { ...input, salary: parsedSalary, position: parsedPosition };
+
         try {
             setLoading(true);
-    
-            const payload = {
-                ...input,
-                salary: Number(input.salary.replace(/[^0-9]/g, "").slice(0, 5)),
-                experienceLevel:
-                    input.experience.toLowerCase().includes("fresher") ? 0 :
-                    input.experience.match(/\d+/) ? Number(input.experience.match(/\d+/)[0]) : 0,
-                position: Number(input.position),
-                requirements: input.requirements.split(',').map(r => r.trim()),
-                company: input.companyId
-            };
-    
             const res = await axios.post(`${JOB_API_END_POINT}/post`, payload, {
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
             });
-    
             if (res.data.success) {
                 toast.success(res.data.message);
                 navigate("/admin/jobs");
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || "Something went wrong");
+            toast.error(error.response.data.message);
         } finally {
             setLoading(false);
         }
@@ -133,9 +127,12 @@ const PostJob = () => {
                             gap: '1.1rem',
                             marginBottom: '1.1rem',
                         }}>
-                            {fields.map(({ label, name, type }) => (
+                            {fields.map(({ label, name, type, required }) => (
                                 <div key={name}>
-                                    <label style={labelStyle}>{label}</label>
+                                    <label style={labelStyle}>
+                                        {label}
+                                        {required && <span style={{ color: '#e53e3e', marginLeft: '3px' }}>*</span>}
+                                    </label>
                                     <input
                                         type={type}
                                         name={name}
@@ -151,7 +148,7 @@ const PostJob = () => {
                             {/* Company select */}
                             {companies.length > 0 && (
                                 <div>
-                                    <label style={labelStyle}>Company</label>
+                                    <label style={labelStyle}>Company <span style={{ color: '#e53e3e', marginLeft: '3px' }}>*</span></label>
                                     <Select onValueChange={selectChangeHandler}>
                                         <SelectTrigger style={{
                                             ...inputStyle,
