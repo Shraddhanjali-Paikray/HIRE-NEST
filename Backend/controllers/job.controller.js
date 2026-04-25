@@ -37,11 +37,11 @@ export const postJob = async (req, res) => {
       });
     }
     const parsedSalary = toNumber(salary);
-    const parsedExperience = toNumber(experience);
+    // experience is a string e.g. 'Fresher', '0-5 years'
     const parsedPosition = toNumber(position);
     if (parsedSalary === null || parsedPosition === null) {
       return res.status(400).json({
-        message: "Salary and Position must be valid numbers",
+        message: "Salary and No. of Positions must be valid numbers",
         success: false,
       });
     }
@@ -55,7 +55,7 @@ export const postJob = async (req, res) => {
       salary: parsedSalary,
       location,
       jobType,
-      experienceLevel: parsedExperience || 0,
+      experienceLevel: experience || '',
       position: parsedPosition,
       company: companyId,
       created_by: UserId,
@@ -90,15 +90,9 @@ export const getAllJobs = async (req, res) => {
       .populate({ path: "company" })
       .sort({ createdAt: -1 });
 
-    if (!jobs || jobs.length === 0) {
-      return res.status(404).json({
-        message: "Jobs not found.",
-        success: false,
-      });
-    }
-
+    // Always return success with empty array if no jobs found
     return res.status(200).json({
-      jobs,
+      jobs: jobs || [],
       success: true,
     });
 
@@ -159,5 +153,54 @@ export const getAdminJobs = async (req, res) => {
       message: "Server error",
       success: false,
     });
+  }
+};
+export const updateJob = async (req, res) => {
+  try {
+    const { title, description, requirements, salary, location, jobType, experience, position } = req.body;
+
+    const parsedSalary   = Number(salary)   || 0;
+    const parsedPosition = Number(position) || 0;
+    // experience stays as string
+
+    const requirementsArray = requirements
+      ? (Array.isArray(requirements) ? requirements : requirements.split(",").map(r => r.trim()))
+      : undefined;
+
+    const updateData = {
+      ...(title        && { title }),
+      ...(description  && { description }),
+      ...(requirementsArray && { requirements: requirementsArray }),
+      ...(salary       !== undefined && { salary: parsedSalary }),
+      ...(location     && { location }),
+      ...(jobType      && { jobType }),
+      ...(experience   !== undefined && { experienceLevel: experience }),
+      ...(position     !== undefined && { position: parsedPosition }),
+    };
+
+    const job = await Job.findByIdAndUpdate(req.params.id, updateData, { new: true });
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found", success: false });
+    }
+
+    return res.status(200).json({ message: "Job updated successfully", job, success: true });
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error", success: false });
+  }
+};
+
+export const deleteJob = async (req, res) => {
+  try {
+    const job = await Job.findByIdAndDelete(req.params.id);
+    if (!job) {
+      return res.status(404).json({ message: "Job not found", success: false });
+    }
+    return res.status(200).json({ message: "Job deleted successfully", success: true });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error", success: false });
   }
 };

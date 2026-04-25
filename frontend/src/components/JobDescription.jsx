@@ -89,7 +89,7 @@ const JobDescription = () => {
                     </h1>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         <span style={{ ...pill, backgroundColor: '#e8f0dc', color: '#3a5a1c', border: '1px solid #b5cc90' }}>
-                            {singleJob?.postion} Positions
+                            {singleJob?.position || singleJob?.postion} {(singleJob?.position || singleJob?.postion) === 1 ? 'Position' : 'Positions'}
                         </span>
                         <span style={{ ...pill, backgroundColor: '#fdf3e3', color: '#8a5e1a', border: '1px solid #e8c88a' }}>
                             {singleJob?.jobType}
@@ -150,7 +150,7 @@ const JobDescription = () => {
                     {[
                         { label: 'Role', value: singleJob?.title },
                         { label: 'Location', value: singleJob?.location },
-                        { label: 'Experience', value: singleJob?.experienceLevel || singleJob?.experience || singleJob?.experienceLevel || '—' },
+                        { label: 'Experience', value: singleJob?.experienceLevel || '—' },
                         { label: 'Salary', value: singleJob?.salary ? `₹${singleJob.salary} LPA` : '—' },
                         { label: 'Total Applicants', value: singleJob?.applications?.length },
                         { label: 'Posted Date', value: singleJob?.createdAt?.split("T")[0] },

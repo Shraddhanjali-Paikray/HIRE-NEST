@@ -1,50 +1,77 @@
-import React, { useEffect, useState } from 'react'
+import React, { useMemo } from 'react'
 import Navbar from './shared/Navbar'
 import Job from './Job';
-import { useDispatch, useSelector } from 'react-redux';
-import { setSearchedQuery } from '@/redux/jobSlice';
+import { useSelector } from 'react-redux';
 import useGetAllJobs from '@/hooks/useGetAllJobs';
+import { applyFilters } from './filterUtils';
+
+const getFilteredJobs = (allJobs, searchedQuery) => {
+    if (!allJobs.length) return [];
+    if (!searchedQuery) return allJobs;
+
+    // Structured filter from FilterCard
+    try {
+        const parsed = JSON.parse(searchedQuery);
+        const selected = {};
+        Object.entries(parsed).forEach(([k, v]) => { selected[k] = new Set(v); });
+        return applyFilters(allJobs, selected);
+    } catch (_) {}
+
+    // Plain text — words matched against title, company, location, description
+    const words = searchedQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    if (!words.length) return allJobs;
+    return allJobs.filter(job => {
+        const searchable = [
+            job.title,
+            job.company?.name,
+            job.location,
+            job.description,
+            job.jobType,
+        ].filter(Boolean).join(' ').toLowerCase();
+        return words.every(w => searchable.includes(w));
+    });
+};
 
 const Browse = () => {
     useGetAllJobs();
     const { allJobs, searchedQuery } = useSelector(store => store.job);
-    const [filterJobs, setFilterJobs] = useState(allJobs);
-    const dispatch = useDispatch();
+    const filterJobs = useMemo(
+        () => getFilteredJobs(allJobs, searchedQuery),
+        [allJobs, searchedQuery]
+    );
 
-    // ✅ FIX: filter jobs whenever allJobs or searchedQuery changes
-    useEffect(() => {
-        if (searchedQuery) {
-            const filtered = allJobs.filter((job) =>
-                job.title.toLowerCase().includes(searchedQuery.toLowerCase()) ||
-                job.description.toLowerCase().includes(searchedQuery.toLowerCase()) ||
-                job.location.toLowerCase().includes(searchedQuery.toLowerCase())
-            );
-            setFilterJobs(filtered);
-        } else {
-            setFilterJobs(allJobs);
-        }
-    }, [allJobs, searchedQuery]);
+    // Don't clear searchedQuery on unmount — let user navigate back and keep results
 
-    // Clear query only on unmount
-    useEffect(() => {
-        return () => {
-            dispatch(setSearchedQuery(""));
-        }
-    }, []);
+    const isLoading = allJobs.length === 0 && searchedQuery;
 
     return (
-        <div>
+        <div className="bg-[#f5f0e8] min-h-screen">
             <Navbar />
-            <div className='max-w-7xl mx-auto my-10'>
-                <h1 className='font-bold text-xl my-10'>Search Results ({filterJobs.length})</h1>
-                <div className='grid grid-cols-3 gap-4'>
-                    {filterJobs.map((job) => (
-                        <Job key={job._id} job={job} />
-                    ))}
-                </div>
+            <div className='max-w-7xl mx-auto my-10 px-6'>
+                <h1 className='font-bold text-xl my-6 font-serif text-[#2c2415]'>
+                    {searchedQuery
+                        ? `Results for "${searchedQuery}" (${filterJobs.length})`
+                        : `All Jobs (${filterJobs.length})`
+                    }
+                </h1>
+                {isLoading ? (
+                    <div className="flex items-center justify-center h-[60vh]">
+                        <span className="text-[#6b5c45] text-lg font-medium font-serif">Loading...</span>
+                    </div>
+                ) : filterJobs.length === 0 ? (
+                    <div className="flex items-center justify-center h-[60vh]">
+                        <span className="text-[#6b5c45] text-lg font-medium font-serif">
+                            No jobs found{searchedQuery ? ` for "${searchedQuery}"` : ''}
+                        </span>
+                    </div>
+                ) : (
+                    <div className='grid grid-cols-3 gap-4'>
+                        {filterJobs.map((job) => <Job key={job._id} job={job} />)}
+                    </div>
+                )}
             </div>
         </div>
     )
 }
 
-export default Browse
+export default Browse;

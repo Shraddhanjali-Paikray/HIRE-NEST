@@ -1,5 +1,6 @@
 import { Application } from "../models/application.model.js";
 import { Job } from "../models/job.model.js";
+import { Notification } from "../models/notification.model.js";
 
 export const applyJob = async (req, res) => {
     try {
@@ -37,6 +38,27 @@ export const applyJob = async (req, res) => {
 
         job.applications.push(newApplication._id);
         await job.save();
+
+        // Notify the applicant that their application was submitted
+        await Notification.create({
+            user: userId,
+            message: `You have successfully applied for "${job.title}".`,
+            type: "job_applied",
+            job: jobId,
+            application: newApplication._id,
+        });
+
+        // Notify the recruiter that someone applied
+        if (job.created_by) {
+            await Notification.create({
+                user: job.created_by,
+                message: `A new applicant has applied for your job "${job.title}".`,
+                type: "job_applied",
+                job: jobId,
+                application: newApplication._id,
+            });
+        }
+
         return res.status(201).json({
             message:"Job applied successfully.",
             success:true
@@ -118,6 +140,15 @@ export const updateStatus = async (req,res) => {
         // update the status
         application.status = status.toLowerCase();
         await application.save();
+
+        // Notify the applicant about their status change
+        await application.populate({ path: 'job', select: 'title' });
+        await Notification.create({
+            user: application.applicant,
+            message: `Your application for "${application.job?.title || 'a job'}" has been ${status.toLowerCase()}.`,
+            type: "status_updated",
+            application: applicationId,
+        });
 
         return res.status(200).json({
             message:"Status updated successfully.",

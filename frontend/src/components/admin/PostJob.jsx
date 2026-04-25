@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Navbar from '../shared/Navbar'
 import { useSelector } from 'react-redux'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import axios from 'axios'
 import { JOB_API_END_POINT } from '@/utils/constant'
 import { toast } from 'sonner'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 
 const inputStyle = {
@@ -32,14 +32,14 @@ const labelStyle = {
 }
 
 const fields = [
-    { label: 'Title',                    name: 'title',       type: 'text',   required: true  },
-    { label: 'Description',              name: 'description', type: 'text',   required: true  },
-    { label: 'Requirements',             name: 'requirements',type: 'text',   required: true  },
-    { label: 'Salary (in LPA)',          name: 'salary',      type: 'number', required: true  },
-    { label: 'Location',                 name: 'location',    type: 'text',   required: true  },
-    { label: 'Job Type',                 name: 'jobType',     type: 'text',   required: true  },
-    { label: 'Experience Level',         name: 'experience',  type: 'text',   required: false },
-    { label: 'No. of Positions',         name: 'position',    type: 'number', required: true  },
+    { label: 'Title',            name: 'title',       type: 'text',   required: true,  hint: '',                    placeholder: 'e.g. Frontend Developer'         },
+    { label: 'Description',      name: 'description', type: 'text',   required: true,  hint: '',                    placeholder: 'Brief overview of the role'       },
+    { label: 'Requirements',     name: 'requirements',type: 'text',   required: true,  hint: 'comma-separated',     placeholder: 'e.g. React, Node.js, MongoDB'    },
+    { label: 'Salary',           name: 'salary',      type: 'number', required: true,  hint: 'in LPA, e.g. 12',     placeholder: '12'                               },
+    { label: 'Location',         name: 'location',    type: 'text',   required: true,  hint: '',                    placeholder: 'e.g. Bangalore or Remote'         },
+    { label: 'Job Type',         name: 'jobType',     type: 'text',   required: true,  hint: '',                    placeholder: 'e.g. Full-Time, Internship'       },
+    { label: 'Experience Level', name: 'experience',  type: 'text',   required: false, hint: 'text or range',       placeholder: 'e.g. Fresher, 0–2 yrs, 5+ yrs'  },
+    { label: 'No. of Positions', name: 'position',    type: 'number', required: true,  hint: 'number',              placeholder: 'e.g. 3'                           },
 ]
 
 const PostJob = () => {
@@ -49,6 +49,8 @@ const PostJob = () => {
     });
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { id } = useParams();
+    const isEditMode = Boolean(id);
     const { companies } = useSelector(store => store.company);
 
     const changeEventHandler = (e) => setInput({ ...input, [e.target.name]: e.target.value });
@@ -58,21 +60,53 @@ const PostJob = () => {
         setInput({ ...input, companyId: selectedCompany._id });
     };
 
+    // Fetch existing job data when editing
+    useEffect(() => {
+        if (!isEditMode) return;
+        const fetchJob = async () => {
+            try {
+                const res = await axios.get(`${JOB_API_END_POINT}/get/${id}`, { withCredentials: true });
+                if (res.data.success) {
+                    const job = res.data.job;
+                    setInput({
+                        title:        job.title        || '',
+                        description:  job.description  || '',
+                        requirements: Array.isArray(job.requirements) ? job.requirements.join(', ') : job.requirements || '',
+                        salary:       job.salary       || '',
+                        location:     job.location     || '',
+                        jobType:      job.jobType      || '',
+                        experience:   job.experienceLevel || job.experience || '',
+                        position:     job.position     || '',
+                        companyId:    job.company?._id || job.company || '',
+                    });
+                }
+            } catch (error) {
+                toast.error('Failed to load job details');
+            }
+        };
+        fetchJob();
+    }, [id, isEditMode]);
+
     const submitHandler = async (e) => {
         e.preventDefault();
 
         // Strip non-numeric chars from salary so backend gets a number e.g. "₹10,000/mo" → 10000
         const parsedPosition = Number(input.position) || 0;
         // Send salary as plain number — enter just a number e.g. 15000
-        const parsedSalary = Number(String(input.salary).replace(/[^\d]/g, '')) || 0;
+        const parsedSalary = Number(String(input.salary).replace(/[^\d.]/g, '')) || 0;
         const payload = { ...input, salary: parsedSalary, position: parsedPosition };
 
         try {
             setLoading(true);
-            const res = await axios.post(`${JOB_API_END_POINT}/post`, payload, {
-                headers: { 'Content-Type': 'application/json' },
-                withCredentials: true
-            });
+            const res = isEditMode
+                ? await axios.put(`${JOB_API_END_POINT}/update/${id}`, payload, {
+                    headers: { 'Content-Type': 'application/json' },
+                    withCredentials: true
+                  })
+                : await axios.post(`${JOB_API_END_POINT}/post`, payload, {
+                    headers: { 'Content-Type': 'application/json' },
+                    withCredentials: true
+                  });
             if (res.data.success) {
                 toast.success(res.data.message);
                 navigate("/admin/jobs");
@@ -110,10 +144,10 @@ const PostJob = () => {
                             color: '#2c3e1f',
                             margin: '0 0 0.2rem',
                         }}>
-                            Post a New Job
+                            {isEditMode ? 'Edit Job' : 'Post a New Job'}
                         </h1>
                         <p style={{ fontSize: '0.85rem', color: '#7a8c5e', margin: 0 }}>
-                            Fill in the details below to publish a job listing
+                            {isEditMode ? 'Update the job details below' : 'Fill in the details below to publish a job listing'}
                         </p>
                     </div>
 
@@ -127,10 +161,11 @@ const PostJob = () => {
                             gap: '1.1rem',
                             marginBottom: '1.1rem',
                         }}>
-                            {fields.map(({ label, name, type, required }) => (
+                            {fields.map(({ label, name, type, required, hint, placeholder }) => (
                                 <div key={name}>
                                     <label style={labelStyle}>
                                         {label}
+                                        {hint && <span style={{ color: '#9a8c6a', fontWeight: 400, textTransform: 'none', letterSpacing: 0, marginLeft: '5px', fontSize: '0.68rem' }}>({hint})</span>}
                                         {required && <span style={{ color: '#e53e3e', marginLeft: '3px' }}>*</span>}
                                     </label>
                                     <input
@@ -138,7 +173,8 @@ const PostJob = () => {
                                         name={name}
                                         value={input[name]}
                                         onChange={changeEventHandler}
-                                        style={inputStyle}
+                                        placeholder={placeholder}
+                                        style={{ ...inputStyle, '::placeholder': { color: '#a09880' } }}
                                         onFocus={e => e.currentTarget.style.borderColor = '#3a5a1c'}
                                         onBlur={e => e.currentTarget.style.borderColor = '#c8bc96'}
                                     />
@@ -241,7 +277,7 @@ const PostJob = () => {
                                     <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
                                     Please wait…
                                 </>
-                            ) : 'Post New Job'}
+                            ) : isEditMode ? 'Update Job' : 'Post New Job'}
                         </button>
                     </form>
                 </div>

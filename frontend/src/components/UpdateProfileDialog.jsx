@@ -89,11 +89,11 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                     <form onSubmit={submitHandler}>
                         <div className='grid gap-4 py-4'>
                             {[
-                                { label: "Name", id: "name", name: "fullname", type: "text", value: input.fullname },
-                                { label: "Number", id: "number", name: "phoneNumber", type: "text", value: input.phoneNumber },
-                                { label: "Bio", id: "bio", name: "bio", type: "text", value: input.bio },
-                                { label: "Skills", id: "skills", name: "skills", type: "text", value: input.skills },
-                            ].map(({ label, id, name, type, value }) => (
+                                { label: "Name",    id: "name",    name: "fullname",    type: "text", value: input.fullname,    placeholder: "Your full name"                        },
+                                { label: "Number",  id: "number",  name: "phoneNumber", type: "text", value: input.phoneNumber, placeholder: "10-digit mobile number"                },
+                                { label: "Bio",     id: "bio",     name: "bio",         type: "text", value: input.bio,         placeholder: "e.g. Passionate React Developer"       },
+                                { label: "Skills",  id: "skills",  name: "skills",      type: "text", value: input.skills,      placeholder: "e.g. React, Node.js, Python (comma-separated)" },
+                            ].map(({ label, id, name, type, value, placeholder }) => (
                                 <div key={id} className='grid grid-cols-4 items-center gap-4'>
                                     <Label htmlFor={id} className="text-right text-[#6b5c45] text-sm">{label}</Label>
                                     <Input
@@ -102,6 +102,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                                         type={type}
                                         value={value}
                                         onChange={changeEventHandler}
+                                        placeholder={placeholder}
                                         className="col-span-3 border-[#d9cdb8] bg-white focus:border-[#4a6741] focus:ring-[#4a6741] text-[#2c2415] placeholder:text-[#b5a898]"
                                     />
                                 </div>

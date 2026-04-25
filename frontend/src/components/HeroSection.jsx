@@ -23,7 +23,7 @@ const VettedBadge = () => (
 /* ── Trending roles shown in hero ─────────────────────────────────── */
 const trendingRoles = [
   "Frontend Developer",
-  "Data Scientist",
+  "Data Science",
   "Product Manager",
   "DevOps Engineer",
   "UI/UX Designer",

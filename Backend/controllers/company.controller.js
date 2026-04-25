@@ -108,3 +108,14 @@ export const updateCompany = async(req,res)=>{
 
     }
 }
+
+export const deleteCompany = async (req, res) => {
+    try {
+        const company = await Company.findByIdAndDelete(req.params.id);
+        if (!company) return res.status(404).json({ message: "Company not found", success: false });
+        return res.status(200).json({ message: "Company deleted successfully", success: true });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Server error", success: false });
+    }
+};

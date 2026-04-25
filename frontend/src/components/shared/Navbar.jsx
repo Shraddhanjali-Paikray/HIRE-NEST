@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Link, useNavigate } from "react-router-dom";
-import { User2, LogOut, Bell } from "lucide-react";
+import { User2, LogOut, Bell, Bookmark } from "lucide-react";
 import NestLogo from "@/assets/NestLogo.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
@@ -103,7 +103,6 @@ const Navbar = () => {
                 <NavLink to="/">Home</NavLink>
                 <NavLink to="/jobs">Jobs</NavLink>
                 <NavLink to="/browse">Browse</NavLink>
-                {user && <NavLink to="/saved-jobs">Saved Jobs</NavLink>}
                 <NavLink to="/about">About</NavLink>
               </>
             )}
@@ -129,13 +128,24 @@ const Navbar = () => {
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
 
+              {/* Saved Jobs icon — jobseeker only */}
+              {user?.role !== 'recruiter' && (
+                <button
+                  onClick={() => navigate('/saved-jobs')}
+                  title="Saved Jobs"
+                  style={{ position: 'relative', border: 'none', background: 'transparent', cursor: 'pointer', padding: 0 }}
+                >
+                  <Bookmark size={20} style={{ color: '#4a6428' }} />
+                </button>
+              )}
+
               {/* Notification bell */}
               <Popover>
                 <PopoverTrigger asChild>
                   <button style={{ position: 'relative', border: 'none', background: 'transparent', cursor: 'pointer', padding: 0 }}>
                     <Bell size={20} style={{ color: '#4a6428' }} />
                     {unreadCount > 0 && (
-                      <span style={{ position: 'absolute', top: '-4px', right: '-6px', backgroundColor: '#e53e3e', color: '#fff', borderRadius: '999px', padding: '0 6px', fontSize: '0.65rem', fontWeight: 700 }}>
+                      <span style={{ position: 'absolute', top: '-4px', right: '-6px', backgroundColor: '#3a5a1c', color: '#f5f0e6', borderRadius: '999px', padding: '0 6px', fontSize: '0.65rem', fontWeight: 700 }}>
                         {unreadCount}
                       </span>
                     )}

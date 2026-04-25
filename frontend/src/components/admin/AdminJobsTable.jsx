@@ -1,13 +1,31 @@
 import React, { useEffect, useState } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
-import { Edit2, Eye, MoreHorizontal } from 'lucide-react'
-import { useSelector } from 'react-redux'
+import { Edit2, Eye, Trash2, MoreHorizontal } from 'lucide-react'
+import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { toast } from 'sonner'
+import { JOB_API_END_POINT } from '@/utils/constant'
+import { setAllAdminJobs } from '@/redux/jobSlice'
 
 const AdminJobsTable = () => {
     const { allAdminJobs, searchJobByText } = useSelector(store => store.job);
     const [filterJobs, setFilterJobs] = useState(allAdminJobs);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const deleteHandler = async (jobId) => {
+        if (!window.confirm('Are you sure you want to delete this job?')) return;
+        try {
+            const res = await axios.delete(`${JOB_API_END_POINT}/delete/${jobId}`, { withCredentials: true });
+            if (res.data.success) {
+                dispatch(setAllAdminJobs(allAdminJobs.filter(j => j._id !== jobId)));
+                toast.success('Job deleted successfully');
+            }
+        } catch (error) {
+            toast.error(error?.response?.data?.message || 'Failed to delete job');
+        }
+    };
 
     useEffect(() => {
         const filteredJobs = allAdminJobs.filter((job) => {
@@ -152,6 +170,22 @@ const AdminJobsTable = () => {
                                             >
                                                 <Eye size={14} color="#4a6428" />
                                                 Applicants
+                                            </div>
+                                            <div
+                                                onClick={() => deleteHandler(job._id)}
+                                                style={{
+                                                    display: 'flex', alignItems: 'center', gap: '8px',
+                                                    padding: '8px 10px', borderRadius: '7px',
+                                                    cursor: 'pointer', color: '#8a3a1c',
+                                                    fontSize: '0.85rem', fontWeight: 500,
+                                                    transition: 'background-color 0.12s ease',
+                                                    marginTop: '2px',
+                                                }}
+                                                onMouseEnter={e => e.currentTarget.style.backgroundColor = '#fdf0ee'}
+                                                onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                                            >
+                                                <Trash2 size={14} color="#8a3a1c" />
+                                                Delete
                                             </div>
                                         </PopoverContent>
                                     </Popover>
