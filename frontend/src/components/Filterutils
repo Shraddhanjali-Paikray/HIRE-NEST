@@ -10,7 +10,7 @@ export const filterData = [
     filterType: "Location",
     name: "location",
     array: [
-      { label: "Delhi NCR",  value: "delhi",     keywords: ["delhi", "ncr", "noida", "gurgaon", "gurugram", "faridabad"] },
+      { label: "chandrasekharpur",  value: "delhi",     keywords: ["chandrasekharpur"] },
       { label: "Bangalore",  value: "bangalore",  keywords: ["bangalore", "bengaluru"] },
       { label: "Hyderabad",  value: "hyderabad",  keywords: ["hyderabad", "secunderabad"] },
       { label: "Pune",       value: "pune",       keywords: ["pune"] },
